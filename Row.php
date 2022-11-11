@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 class Row
 {
@@ -24,28 +24,37 @@ class Row
         return $this->date;
     }
 
-    public function getDeathCause(): string
-    {
-        return $this->deathCause;
-    }
-
     public function getId(): string
     {
         return $this->id;
     }
 
-    public function getNonViolentCause(): string
+    public function getDeathCause(): string
     {
+        return $this->deathCause;
+    }
+
+    public function getNonViolentCause(): ?string
+    {
+        if (strlen($this->nonViolentCause) == 0) {
+            return null;
+        }
         return $this->nonViolentCause;
     }
 
-    public function getViolentCause(): string
+    public function getViolentCause(): ?string
     {
+        if (strlen($this->violentCause) == 0) {
+            return null;
+        }
         return $this->violentCause;
     }
 
-    public function getViolentCircumstances(): string
+    public function getViolentCircumstances(): ?string
     {
+        if (strlen($this->violentCircumstances) == 0) {
+            return null;
+        }
         return $this->violentCircumstances;
     }
 }

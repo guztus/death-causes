@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 require_once "Row.php";
 require_once "Statistic.php";
@@ -7,7 +7,6 @@ $statistic = new Statistic();
 
 $row = -1;
 if (($handle = fopen("vtmec-causes-of-death.csv", "r")) !== false) {
-
     while (($data = fgetcsv($handle, 1000)) !== false) {
         $row++;
         if ($row == 0) {
@@ -18,17 +17,15 @@ if (($handle = fopen("vtmec-causes-of-death.csv", "r")) !== false) {
         $newRow = new Row($data[0], $data[1], $data[2], $data[3], $data[4], $data[5]);
         $statistic->addData($newRow);
 
-        if ($row == 7) {
-            break;
-        }
+//        if ($row == 500) {
+//            break;
+//        }
     }
     fclose($handle);
 }
 
-//var_dump($statistic->getData());
-var_dump($statistic->getByDeathCause('Nevardarbīga nāve'));
-var_dump($statistic->getDeathCauseCount('Nevardarbīga nāve'));
-//var_dump($statistic->getByNonViolentCause('Sirds asinsvadu slimības'));
+$searchInput = "vardarbīg";
 
-
-var_dump("Total reports: " . $statistic->getTotalReports());
+$percentageOfTotal = "" . round(($statistic->getFoundReportCount($searchInput) / $statistic->getTotalReportCount()) * 100);
+echo "From {$statistic->getTotalReportCount()} reports {$statistic->getFoundReportCount($searchInput)} matched the search query." . PHP_EOL;
+echo "Approx {$percentageOfTotal}%" . PHP_EOL;

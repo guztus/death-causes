@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 require_once "Row.php";
 
@@ -22,39 +22,39 @@ class Statistic
         return $this->header;
     }
 
-    public function getData(): array
+    public function getAllData(): array
     {
         return $this->data;
     }
 
-    public function getTotalReports(): int
+    public function getTotalReportCount(): int
     {
         return count($this->data);
     }
 
-    public function getByDeathCause(string $deathCause): array
-    {
-        return array_filter($this->data, function (Row $row) use ($deathCause) {
-            return $row->getDeathCause() == $deathCause;
-        });
-    }
-
-    public function getDeathCauseCount(string $deathCause): int
+    public function getFoundReportCount($deathCause): int
     {
         return count($this->getByDeathCause($deathCause));
     }
 
-    public function getByNonViolentCause(string $nonViolentCause): array
+    private function formatText($text): string
     {
-        return array_filter($this->data, function (Row $row) use ($nonViolentCause) {
-            return strpos($row->getNonViolentCause(), $nonViolentCause);
-        });
+        return strtolower($text);
     }
 
-    public function getByViolentCause(string $violentCause): array
+    public function getByDeathCause(string $deathCause): array
     {
-        return array_filter($this->data, function (Row $row) use ($violentCause) {
-            return strpos($row->getByViolentCause(), $violentCause);
+        $deathCause = trim($deathCause);
+        $deathCause = " " . $deathCause;
+        return array_filter($this->data, function (Row $row) use ($deathCause) {
+            $deathCauseList = '  ';
+            $deathCauseList .= $row->getDeathCause();
+            $deathCauseList .= $row->getNonViolentCause();
+            $deathCauseList .= $row->getViolentCause();
+            $deathCauseList .= $row->getViolentCircumstances();
+            $deathCauseList = str_replace(';', ' ', $deathCauseList);
+
+            return strpos($this->formatText($deathCauseList), $this->formatText($deathCause));
         });
     }
 }
