@@ -1,49 +1,34 @@
 <?php
 
-//$handle = fopen('vtmec-causes-of-death.csv', "r");
-//$csv = fgetcsv($handle, 1000, ",");
-//
-//var_dump($csv);
+require_once "Row.php";
+require_once "Statistic.php";
 
-class Row
-{
-    private string $date;
-    private string $reason;
-    private array $causes;
+$statistic = new Statistic();
 
-    public function __construct(string $date, string $reason, array $causes = [])
-    {
-        $this->date = $date;
-        $this->reason = $reason;
-        $this->causes = $causes;
-    }
-}
-
-$rows = [];
-
-$row = 1;
+$row = -1;
 if (($handle = fopen("vtmec-causes-of-death.csv", "r")) !== false) {
 
     while (($data = fgetcsv($handle, 1000)) !== false) {
-        $num = count($data);
-
         $row++;
-
-        $deathCause = "Sirds asinsvadu slimības";
-//        what we want is stored in $data[3]. so return only those RESULTS that match "Sirds asinsvadu slimības".
-        if (strpos($data[3], $deathCause)) {
-            echo "$row: " . PHP_EOL;
-
-            for ($c=0; $c < $num; $c++) {
-                echo $data[$c] . PHP_EOL;
-            }
-            echo PHP_EOL;
+        if ($row == 0) {
+            $statistic->addHeader(new Row($data[0], $data[1], $data[2], $data[3], $data[4], $data[5]));
+            continue;
         }
 
-        $causes = explode(';', $data[3]);
-        $rows[] = new Row($data[1], $data[2], array_filter($causes));
+        $newRow = new Row($data[0], $data[1], $data[2], $data[3], $data[4], $data[5]);
+        $statistic->addData($newRow);
 
+        if ($row == 7) {
+            break;
+        }
     }
-
     fclose($handle);
 }
+
+//var_dump($statistic->getData());
+var_dump($statistic->getByDeathCause('Nevardarbīga nāve'));
+var_dump($statistic->getDeathCauseCount('Nevardarbīga nāve'));
+//var_dump($statistic->getByNonViolentCause('Sirds asinsvadu slimības'));
+
+
+var_dump("Total reports: " . $statistic->getTotalReports());
